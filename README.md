@@ -170,22 +170,6 @@ To securely log in to Docker Hub during the workflow, you must store your creden
 
 ---
 
-## 📁 Project Structure
-
-```
-├── .env                    # Environment variables
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml      # GitHub Actions workflow
-├── Dockerfile             # Docker configuration for Python app
-├── docker-compose.yml     # Multi-container setup
-├── requirements.txt       # Python dependencies
-├── app.py                 # Main application file
-└── README.md             # This file
-```
-
----
-
 ## 🎯 Learning Outcomes
 
 By completing this project, you will gain hands-on experience with:
