@@ -1,11 +1,14 @@
 name: "CI/CD Pipeline - Build and Push"
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: "Stage 1: Checkout Code"
         uses: actions/checkout@v4
@@ -23,6 +26,14 @@ jobs:
         run: |
           COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ris-devops-practice-project:latest ${{ secrets.DOCKERHUB_USERNAME }}/ris-devops-practice-project:$COMMIT_SHA
+
+      - name: "Stage 4.5: Scan Docker Image with Trivy"
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/ris-devops-practice-project:latest
+          format: table
+          exit-code: 0      
+          ignore-unfixed: true
           
       - name: "Stage 5: Push Docker Images to DockerHub"
         run: |
