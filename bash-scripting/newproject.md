@@ -2,7 +2,6 @@
 
 Build a Bash-based monitoring tool that runs as a systemd service and provides a CLI dashboard for monitoring system metrics, container status, user activity, service logs, and network health. This project simulates real-world monitoring tools used in production environments.
 
-**Estimated Total Time:** 3–4 weeks (10–15 hours per week)
 
 ---
 
