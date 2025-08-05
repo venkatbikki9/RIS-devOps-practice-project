@@ -52,7 +52,7 @@ sysmondash/
 └── tests/
     ├── unit_tests.bats        # BATS test files (bonus)
     └── integration_tests.sh   # Integration tests
- Functional Requirements
+⚙️ Functional Requirements
 1. Main CLI Tool (sysmondash.sh)
 Location: /usr/local/bin/sysmondash
 Permissions: 755 (executable by all users)
@@ -192,7 +192,7 @@ sudo systemctl start sysmondash
 
 # Check status
 sudo systemctl status sysmondash
- Expected Outputs
+📊 Expected Outputs
 CPU and Memory Usage (-c flag)
 === System Resources ===
 CPU Usage: 15.3%
