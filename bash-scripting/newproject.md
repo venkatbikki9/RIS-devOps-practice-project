@@ -1,38 +1,50 @@
-📘 Project Overview
+# 📘 Project Overview
+
 Build a Bash-based monitoring tool that runs as a systemd service and provides a CLI dashboard for monitoring system metrics, container status, user activity, service logs, and network health. This project simulates real-world monitoring tools used in production environments.
 
-✅ Prerequisites
-Before starting this project, you should have:
-Required Knowledge
+**Estimated Total Time:** 3–4 weeks (10–15 hours per week)
 
-Linux Command Line: Comfortable navigating directories, editing files, managing permissions
-Basic Bash Scripting: Understanding variables, functions, conditionals, and loops
-Text Editors: Proficiency with vim, nano, or VS Code
-Process Management: Understanding of processes, services, and process monitoring
+---
 
-System Requirements
+## ✅ Prerequisites
 
-Operating System: Ubuntu 20.04+ or Debian 11+ (or similar systemd-based distribution)
-User Access: sudo privileges for service installation
-Available Resources: At least 1GB free disk space
+### Required Knowledge
 
-Recommended Pre-reading
+- **Linux Command Line**: Comfortable navigating directories, editing files, managing permissions  
+- **Basic Bash Scripting**: Understanding variables, functions, conditionals, and loops  
+- **Text Editors**: Proficiency with `vim`, `nano`, or VS Code  
+- **Process Management**: Understanding of processes, services, and process monitoring  
 
-Bash Scripting Guide
-Systemd Service Units
-Linux System Monitoring Basics
+### System Requirements
 
-🎯 Learning Objectives
+- **Operating System**: Ubuntu 20.04+ or Debian 11+ (or similar systemd-based distribution)  
+- **User Access**: `sudo` privileges for service installation  
+- **Available Resources**: At least 1GB free disk space  
+
+### Recommended Pre-reading
+
+- Bash Scripting Guide  
+- Systemd Service Units  
+- Linux System Monitoring Basics  
+
+---
+
+## 🎯 Learning Objectives
+
 By completing this project, you will:
 
-Master Bash scripting for system administration
-Understand systemd service creation and management
-Learn system monitoring techniques and tools
-Practice DevOps automation and deployment
-Gain experience with log management and rotation
-Understand CLI tool design principles
+- Master Bash scripting for system administration  
+- Understand systemd service creation and management  
+- Learn system monitoring techniques and tools  
+- Practice DevOps automation and deployment  
+- Gain experience with log management and rotation  
+- Understand CLI tool design principles  
 
-📂 Project Structure
+---
+
+## 📂 Project Structure
+
+```
 sysmondash/
 ├── src/
 │   ├── sysmondash.sh          # Main CLI monitoring tool
@@ -52,47 +64,75 @@ sysmondash/
 └── tests/
     ├── unit_tests.bats        # BATS test files (bonus)
     └── integration_tests.sh   # Integration tests
-⚙️ Functional Requirements
-1. Main CLI Tool (sysmondash.sh)
-Location: /usr/local/bin/sysmondash
-Permissions: 755 (executable by all users)
-Owner: root:root
-Command Line Interface
-FlagFunctionExample UsageExpected Behavior-p [port]Show port statussysmondash -p 80Display processes listening on port 80-d [container]Docker container statussysmondash -d nginxShow nginx container details-n [domain]Nginx configurationsysmondash -n example.comShow server block for domain-u [user]User activitysysmondash -u johnShow login history for user-cSystem resourcessysmondash -cDisplay CPU and memory usage-rDisk usagesysmondash -rShow disk space information-t <start> <end>System logssysmondash -t "2024-01-01" "2024-01-02"Show logs between timestamps-aAll metricssysmondash -aDisplay comprehensive system overview-hHelp messagesysmondash -hShow usage information
-Error Handling Requirements
+```
 
-Validate all input parameters
-Handle missing dependencies gracefully
-Provide meaningful error messages
-Exit with appropriate error codes (0 for success, 1-255 for errors)
+---
 
-2. Systemd Service (sysmondash.service)
-Service Type: Simple (long-running process)
-Run Frequency: Continuous monitoring with configurable intervals
-Log Location: /var/log/sysmondash/sysmondash.log
-Service User: sysmondash (dedicated system user)
-Restart Policy: Always restart on failure with 30-second delay
-Service Behavior
+## ⚙️ Functional Requirements
 
-Runs continuously, collecting metrics every 60 seconds
-Writes timestamped entries to log file
-Automatically restarts if process fails
-Can be controlled with standard systemctl commands
+### 1. Main CLI Tool (`sysmondash.sh`)
 
-3. Installation Script (install.sh)
-Requirements: Must be idempotent (safe to run multiple times)
-Installation Steps
+- **Location**: `/usr/local/bin/sysmondash`  
+- **Permissions**: `755`  
+- **Owner**: `root:root`  
 
-Dependency Check: Verify and install required packages
-User Creation: Create dedicated sysmondash system user
-File Deployment: Copy scripts to appropriate system locations
-Permission Setup: Set correct file permissions and ownership
-Log Configuration: Create log directory and setup rotation
-Service Registration: Install and enable systemd service
-Validation: Test that service starts correctly
+#### Command Line Interface
 
-Dependencies to Install
-bash# Required packages
+| Flag         | Function              | Example Usage                      | Expected Behavior                              |
+|--------------|-----------------------|------------------------------------|------------------------------------------------|
+| `-p [port]`  | Show port status      | `sysmondash -p 80`                 | Display processes listening on port 80         |
+| `-d [name]`  | Docker container      | `sysmondash -d nginx`              | Show nginx container details                   |
+| `-n [domain]`| Nginx configuration   | `sysmondash -n example.com`        | Show server block for domain                   |
+| `-u [user]`  | User activity         | `sysmondash -u john`               | Show login history for user                    |
+| `-c`         | System resources      | `sysmondash -c`                    | Display CPU and memory usage                   |
+| `-r`         | Disk usage            | `sysmondash -r`                    | Show disk space information                    |
+| `-t`         | Logs between times    | `sysmondash -t "2024-01-01" "2024-01-02"` | Show logs between timestamps     |
+| `-a`         | All metrics           | `sysmondash -a`                    | Display comprehensive system overview          |
+| `-h`         | Help                  | `sysmondash -h`                    | Show usage information                         |
+
+#### Error Handling Requirements
+
+- Validate all input parameters  
+- Handle missing dependencies gracefully  
+- Provide meaningful error messages  
+- Exit with appropriate error codes (0 for success, 1–255 for errors)  
+
+---
+
+### 2. Systemd Service (`sysmondash.service`)
+
+- **Service Type**: Simple (long-running process)  
+- **Run Frequency**: Continuous monitoring with configurable intervals  
+- **Log Location**: `/var/log/sysmondash/sysmondash.log`  
+- **Service User**: `sysmondash` (dedicated system user)  
+- **Restart Policy**: Always restart on failure with 30-second delay  
+
+#### Service Behavior
+
+- Runs continuously, collecting metrics every 60 seconds  
+- Writes timestamped entries to log file  
+- Automatically restarts if process fails  
+- Can be controlled with standard `systemctl` commands  
+
+---
+
+### 3. Installation Script (`install.sh`)
+
+- **Requirements**: Must be idempotent (safe to run multiple times)  
+
+#### Installation Steps
+
+1. **Dependency Check**: Verify and install required packages  
+2. **User Creation**: Create dedicated `sysmondash` system user  
+3. **File Deployment**: Copy scripts to appropriate system locations  
+4. **Permission Setup**: Set correct file permissions and ownership  
+5. **Log Configuration**: Create log directory and setup rotation  
+6. **Service Registration**: Install and enable systemd service  
+7. **Validation**: Test that service starts correctly  
+
+#### Dependencies to Install
+
+```bash
 apt-get install -y \
     jq \
     curl \
@@ -104,20 +144,30 @@ apt-get install -y \
     coreutils \
     util-linux \
     procps
-4. Log Management
-Log Directory: /var/log/sysmondash/
-Main Log File: sysmondash.log
-Rotation Policy:
+```
 
-Rotate daily
-Keep 7 days of logs
-Compress rotated logs
-Maximum log size: 100MB
+---
 
-🚀 Getting Started (Manual Setup)
-Before building the automated installer, practice these steps manually to understand the process:
-Step 1: Create the Basic Script
-bash# Create project directory
+### 4. Log Management
+
+- **Log Directory**: `/var/log/sysmondash/`  
+- **Main Log File**: `sysmondash.log`  
+
+#### Rotation Policy
+
+- Rotate daily  
+- Keep 7 days of logs  
+- Compress rotated logs  
+- Maximum log size: 100MB  
+
+---
+
+## 🚀 Getting Started (Manual Setup)
+
+### Step 1: Create the Basic Script
+
+```bash
+# Create project directory
 mkdir -p ~/sysmondash/src
 cd ~/sysmondash/src
 
@@ -158,13 +208,24 @@ EOF
 
 # Make executable
 chmod +x sysmondash.sh
-Step 2: Test Basic Functionality
-bash# Test the script
+```
+
+---
+
+### Step 2: Test Basic Functionality
+
+```bash
 ./sysmondash.sh -h
 ./sysmondash.sh -c
 ./sysmondash.sh -r
-Step 3: Create Basic Service File
-bashcat > sysmondash.service << 'EOF'
+```
+
+---
+
+### Step 3: Create Basic Service File
+
+```bash
+cat > sysmondash.service << 'EOF'
 [Unit]
 Description=SysMonDash System Monitoring Service
 After=network.target
@@ -179,8 +240,14 @@ RestartSec=30
 [Install]
 WantedBy=multi-user.target
 EOF
-Step 4: Test Service Installation
-bash# Copy service file (requires sudo)
+```
+
+---
+
+### Step 4: Test Service Installation
+
+```bash
+# Copy service file (requires sudo)
 sudo cp sysmondash.service /etc/systemd/system/
 
 # Reload systemd
@@ -192,25 +259,45 @@ sudo systemctl start sysmondash
 
 # Check status
 sudo systemctl status sysmondash
-📊 Expected Outputs
-CPU and Memory Usage (-c flag)
+```
+
+---
+
+## 📊 Expected Outputs
+
+### CPU and Memory Usage (`-c` flag)
+
+```
 === System Resources ===
 CPU Usage: 15.3%
 Memory Usage: 26.4% (2.1GB / 8.0GB)
 Load Average: 0.50, 0.45, 0.42
 Uptime: 2 days, 14:32
-Disk Usage (-r flag)
+```
+
+### Disk Usage (`-r` flag)
+
+```
 === Disk Usage ===
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/sda1        20G  8.5G   11G  45% /
 /dev/sda2       100G   45G   50G  48% /home
-Port Status (-p 80 flag)
+```
+
+### Port Status (`-p 80` flag)
+
+```
 === Port 80 Status ===
 Status: LISTENING
 Process: nginx (PID: 1234)
 User: www-data
 Command: nginx: master process /usr/sbin/nginx
-Service Logs (from systemd)
+```
+
+### Service Logs (from systemd)
+
+```
 Jan 15 10:30:01 server sysmondash[1234]: [INFO] Starting system monitoring
 Jan 15 10:30:01 server sysmondash[1234]: [INFO] CPU: 12.3%, Memory: 24.1%
 Jan 15 10:31:01 server sysmondash[1234]: [INFO] CPU: 15.7%, Memory: 24.3%
+```
