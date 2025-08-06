@@ -1,302 +1,133 @@
-# 📘 Project Overview
+#  Automated File Backup Tool
 
-Build a Bash-based monitoring tool that runs as a systemd service and provides a CLI dashboard for monitoring system metrics, container status, user activity, service logs, and network health. This project simulates real-world monitoring tools used in production environments.
+This project is a fully automated, command-line-based file backup tool written in Bash. It allows users to back up one or multiple files by simply providing the file paths when running the script. The script dynamically creates backup directories, applies timestamped or custom .bak naming, compresses backups if requested, and can even upload backups to a remote server. It also includes features for backing up recently modified files, keeping a log of all backup operations, and safely managing old backups.
 
+The goal is to create a portable, intelligent, and flexible backup solution that adapts to a variety of real-world use cases, all from the terminal.
 
----
+##  What This Project Does
 
-## ✅ Prerequisites
-
-### Required Knowledge
-
-- **Linux Command Line**: Comfortable navigating directories, editing files, managing permissions  
-- **Basic Bash Scripting**: Understanding variables, functions, conditionals, and loops  
-- **Text Editors**: Proficiency with `vim`, `nano`, or VS Code  
-- **Process Management**: Understanding of processes, services, and process monitoring  
-
-### System Requirements
-
-- **Operating System**: Ubuntu 20.04+ or Debian 11+ (or similar systemd-based distribution)  
-- **User Access**: `sudo` privileges for service installation  
-- **Available Resources**: At least 1GB free disk space  
-
-### Recommended Pre-reading
-
-- Bash Scripting Guide  
-- Systemd Service Units  
-- Linux System Monitoring Basics  
-
----
-
-## 🎯 Learning Objectives
-
-By completing this project, you will:
-
-- Master Bash scripting for system administration  
-- Understand systemd service creation and management  
-- Learn system monitoring techniques and tools  
-- Practice DevOps automation and deployment  
-- Gain experience with log management and rotation  
-- Understand CLI tool design principles  
-
----
-
-## 📂 Project Structure
-
-```
-sysmondash/
-├── src/
-│   ├── sysmondash.sh          # Main CLI monitoring tool
-│   ├── sysmondash.service     # systemd service unit file
-│   └── logrotate.conf         # Log rotation configuration
-├── scripts/
-│   ├── install.sh             # Automated installer script
-│   ├── uninstall.sh           # Cleanup script
-│   └── test.sh                # Basic functionality tests
-├── docs/
-│   ├── README.md              # Main documentation
-│   ├── INSTALL.md             # Installation guide
-│   └── TROUBLESHOOTING.md     # Common issues and solutions
-├── examples/
-│   ├── sample_outputs.txt     # Expected command outputs
-│   └── service_logs.txt       # Sample service logs
-└── tests/
-    ├── unit_tests.bats        # BATS test files (bonus)
-    └── integration_tests.sh   # Integration tests
-```
-
----
-
-## ⚙️ Functional Requirements
-
-### 1. Main CLI Tool (`sysmondash.sh`)
-
-- **Location**: `/usr/local/bin/sysmondash`  
-- **Permissions**: `755`  
-- **Owner**: `root:root`  
-
-#### Command Line Interface
-
-| Flag         | Function              | Example Usage                      | Expected Behavior                              |
-|--------------|-----------------------|------------------------------------|------------------------------------------------|
-| `-p [port]`  | Show port status      | `sysmondash -p 80`                 | Display processes listening on port 80         |
-| `-d [name]`  | Docker container      | `sysmondash -d nginx`              | Show nginx container details                   |
-| `-n [domain]`| Nginx configuration   | `sysmondash -n example.com`        | Show server block for domain                   |
-| `-u [user]`  | User activity         | `sysmondash -u john`               | Show login history for user                    |
-| `-c`         | System resources      | `sysmondash -c`                    | Display CPU and memory usage                   |
-| `-r`         | Disk usage            | `sysmondash -r`                    | Show disk space information                    |
-| `-t`         | Logs between times    | `sysmondash -t "2024-01-01" "2024-01-02"` | Show logs between timestamps     |
-| `-a`         | All metrics           | `sysmondash -a`                    | Display comprehensive system overview          |
-| `-h`         | Help                  | `sysmondash -h`                    | Show usage information                         |
-
-#### Error Handling Requirements
-
-- Validate all input parameters  
-- Handle missing dependencies gracefully  
-- Provide meaningful error messages  
-- Exit with appropriate error codes (0 for success, 1–255 for errors)  
-
----
-
-### 2. Systemd Service (`sysmondash.service`)
-
-- **Service Type**: Simple (long-running process)  
-- **Run Frequency**: Continuous monitoring with configurable intervals  
-- **Log Location**: `/var/log/sysmondash/sysmondash.log`  
-- **Service User**: `sysmondash` (dedicated system user)  
-- **Restart Policy**: Always restart on failure with 30-second delay  
-
-#### Service Behavior
-
-- Runs continuously, collecting metrics every 60 seconds  
-- Writes timestamped entries to log file  
-- Automatically restarts if process fails  
-- Can be controlled with standard `systemctl` commands  
-
----
-
-### 3. Installation Script (`install.sh`)
-
-- **Requirements**: Must be idempotent (safe to run multiple times)  
-
-#### Installation Steps
-
-1. **Dependency Check**: Verify and install required packages  
-2. **User Creation**: Create dedicated `sysmondash` system user  
-3. **File Deployment**: Copy scripts to appropriate system locations  
-4. **Permission Setup**: Set correct file permissions and ownership  
-5. **Log Configuration**: Create log directory and setup rotation  
-6. **Service Registration**: Install and enable systemd service  
-7. **Validation**: Test that service starts correctly  
-
-#### Dependencies to Install
+### 🔹 1. Accepts File(s) as Input
+You can back up one or many files at once:
 
 ```bash
-apt-get install -y \
-    jq \
-    curl \
-    net-tools \
-    docker.io \
-    nginx \
-    logrotate \
-    bash \
-    coreutils \
-    util-linux \
-    procps
+./backup.sh file1.txt file2.jpg /home/user/docs/report.pdf
 ```
 
----
-
-### 4. Log Management
-
-- **Log Directory**: `/var/log/sysmondash/`  
-- **Main Log File**: `sysmondash.log`  
-
-#### Rotation Policy
-
-- Rotate daily  
-- Keep 7 days of logs  
-- Compress rotated logs  
-- Maximum log size: 100MB  
-
----
-
-## 🚀 Getting Started (Manual Setup)
-
-### Step 1: Create the Basic Script
+### 🔹 2. Auto-Creates Backup Folder
+The script automatically creates a folder for the backup, named using the current timestamp:
 
 ```bash
-# Create project directory
-mkdir -p ~/sysmondash/src
-cd ~/sysmondash/src
-
-# Create main script
-cat > sysmondash.sh << 'EOF'
-#!/bin/bash
-# SysMonDash - System Monitoring Tool
-# Version: 1.0
-
-show_help() {
-    echo "Usage: sysmondash [OPTIONS]"
-    echo "Options:"
-    echo "  -c          Show CPU and memory usage"
-    echo "  -r          Show disk usage"
-    echo "  -h          Show this help message"
-}
-
-show_cpu_memory() {
-    echo "=== System Resources ==="
-    echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)%"
-    echo "Memory Usage: $(free -h | awk 'NR==2{printf "%.1f%%", $3*100/$2 }')"
-    echo "Load Average: $(uptime | awk -F'load average:' '{print $2}')"
-}
-
-show_disk_usage() {
-    echo "=== Disk Usage ==="
-    df -h | grep -vE '^Filesystem|tmpfs|cdrom'
-}
-
-# Parse command line arguments
-case "$1" in
-    -c) show_cpu_memory ;;
-    -r) show_disk_usage ;;
-    -h) show_help ;;
-    *) show_help ;;
-esac
-EOF
-
-# Make executable
-chmod +x sysmondash.sh
+~/backups/2025-08-06_15-22-00/
 ```
 
----
+### 🔹 3. Applies Smart File Naming
+Each file is backed up either:
 
-### Step 2: Test Basic Functionality
+- Inside a timestamped folder as-is, or
+- With a .bak extension or timestamp in the filename:
+
+```
+report.docx → report.docx.bak
+```
+
+This helps identify the backup file even when stored individually.
+
+### 🔹 4. Supports Compression with Flags
+You can use a flag like `--compress` to compress all the files into a .tar.gz archive:
 
 ```bash
-./sysmondash.sh -h
-./sysmondash.sh -c
-./sysmondash.sh -r
+./backup.sh --compress file1.txt file2.jpg
 ```
 
----
+The compressed file will be named with a timestamp.
 
-### Step 3: Create Basic Service File
+### 🔹 5. Keeps a Log of All Actions
+Every time the script runs, it logs:
+
+- What files were backed up
+- Where they were saved
+- Time of backup
+- Success or failure messages
+
+This is saved in a log file (e.g., `backup.log`) for transparency and debugging.
+
+### 🔹 6. Performs Remote Backup (Optional)
+Using a `--remote` flag or config setting, the script can upload backups to a remote server via scp or rsync:
 
 ```bash
-cat > sysmondash.service << 'EOF'
-[Unit]
-Description=SysMonDash System Monitoring Service
-After=network.target
-
-[Service]
-Type=simple
-User=root
-ExecStart=/home/$USER/sysmondash/src/sysmondash.sh -c
-Restart=always
-RestartSec=30
-
-[Install]
-WantedBy=multi-user.target
-EOF
+./backup.sh --remote file1.txt
 ```
 
----
+The remote destination and login credentials are defined in the script or a config file.
 
-### Step 4: Test Service Installation
+### 🔹 7. Deletes Older Backups (Rotation)
+You can specify how many backups to keep (e.g., the last 5). Older ones are automatically deleted to save space.
+
+### 🔹 8. Auto-Backs Up Recently Modified Files
+With a flag like `--recent`, the script can scan directories for files modified within the last day (or any set time window) and back them up:
 
 ```bash
-# Copy service file (requires sudo)
-sudo cp sysmondash.service /etc/systemd/system/
-
-# Reload systemd
-sudo systemctl daemon-reload
-
-# Enable and start service
-sudo systemctl enable sysmondash
-sudo systemctl start sysmondash
-
-# Check status
-sudo systemctl status sysmondash
+./backup.sh --recent 1d
 ```
 
----
+This allows for scheduled backups of only new/changed content.
 
-## 📊 Expected Outputs
+### 🔹 9. Optional Log Toggle
+You can disable logging for cleaner runs using `--no-log`, if desired.
 
-### CPU and Memory Usage (`-c` flag)
+### 🔹 10. Help Menu
+Running the script with `--help` shows a usage guide:
 
-```
-=== System Resources ===
-CPU Usage: 15.3%
-Memory Usage: 26.4% (2.1GB / 8.0GB)
-Load Average: 0.50, 0.45, 0.42
-Uptime: 2 days, 14:32
+```bash
+./backup.sh --help
 ```
 
-### Disk Usage (`-r` flag)
+## Skills You'll Use and Learn
 
-```
-=== Disk Usage ===
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1        20G  8.5G   11G  45% /
-/dev/sda2       100G   45G   50G  48% /home
+- Bash scripting (variables, loops, conditionals)
+- File system navigation and file I/O
+- Timestamps with the date command
+- Compression with tar and gzip
+- Uploads with scp or rsync
+- Using command-line flags (getopts or manual parsing)
+- Logging and error handling
+- Automating tasks and cleanup logic
+
+##  Why This Project Is Valuable
+
+- **It's practical** — you can use it every day
+- **It's flexible** — works with any file, any user, any system
+- **It's a launchpad** — you can adapt it for backups, deployments, logging systems, and more
+- **It teaches real automation skills**, similar to those used in DevOps, IT, and sysadmin jobs
+
+##  Safety Design
+
+- The original files are never modified or deleted
+- Backups are stored in dedicated, user-defined directories
+- All file checks are performed before any operation
+- Logs allow you to trace and debug anything that goes wrong
+
+## ✅ Example Usages
+
+**Backup a file:**
+```bash
+./backup.sh ~/Documents/resume.pdf
 ```
 
-### Port Status (`-p 80` flag)
-
-```
-=== Port 80 Status ===
-Status: LISTENING
-Process: nginx (PID: 1234)
-User: www-data
-Command: nginx: master process /usr/sbin/nginx
+**Backup multiple files with compression:**
+```bash
+./backup.sh --compress file1.txt file2.txt
 ```
 
-### Service Logs (from systemd)
+**Backup recently modified files:**
+```bash
+./backup.sh --recent 2d
+```
 
+**Send to remote server:**
+```bash
+./backup.sh --remote ~/Downloads/notes.md
 ```
-Jan 15 10:30:01 server sysmondash[1234]: [INFO] Starting system monitoring
-Jan 15 10:30:01 server sysmondash[1234]: [INFO] CPU: 12.3%, Memory: 24.1%
-Jan 15 10:31:01 server sysmondash[1234]: [INFO] CPU: 15.7%, Memory: 24.3%
-```
+
+This is more than just a script — it's your personal, command-line-powered backup system.
+
