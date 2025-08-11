@@ -88,7 +88,7 @@ Create **3 async FastAPI services** with proper project structure:
 ### 4. Nginx Reverse Proxy
 
 - Configure **Nginx** to route traffic to the gateway service.
-- Implement **load balancing** if multiple gateway instances.
+- Implement **load balancing** in multiple gateway instances.
 - Add static file serving capabilities for future frontend integration.
 - Configure **CORS** headers for API access.
 
