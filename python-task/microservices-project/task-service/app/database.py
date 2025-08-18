@@ -1,14 +1,18 @@
 import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
+from dotenv import load_dotenv
 
-# Database URL from environment variable
-DATABASE_URL = os.getenv("DB_URL", "postgresql+asyncpg://postgres:password@localhost:5433/taskdb")
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DB_URL")
+if not DATABASE_URL:
+    raise ValueError("Environment variable DB_URL is not set.")
 
 # Create async engine
 engine = create_async_engine(
     DATABASE_URL,
-    future=True,
     echo=False,
     pool_pre_ping=True,
     pool_recycle=300,
