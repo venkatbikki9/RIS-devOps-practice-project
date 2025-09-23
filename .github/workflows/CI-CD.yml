@@ -21,9 +21,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       # Step 4: Build and push the Docker image
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/ris-devops-app:latest
+        run: |
+          docker build -t ${{secrets.DOCKER_USERNAME}}/ris-devops-practice-project:latest ./pipeline-practice
+          docker push ${{secrets.DOCKER_USERNAME}}/ris-devops-practice-project:latest
